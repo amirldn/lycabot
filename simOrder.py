@@ -4,9 +4,10 @@ from random import randint
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
+
 
 def address():
     user_postcode = str(
@@ -58,7 +59,7 @@ print("Launching Lycamobile's Site")
 
 elem_radio_no_bonus = WebDriverWait(driver, 50).until(
     EC.presence_of_element_located((By.ID, "online_retention_check_nothanks")))
-print("Found no thanks checkbox")
+print("Site loaded")
 time.sleep(2)
 elem_radio_no_bonus = driver.find_element_by_id("online_retention_check_nothanks")
 elem_radio_no_bonus.click()
@@ -79,10 +80,17 @@ elem_form_first_name = WebDriverWait(driver, 50).until(
     EC.element_to_be_clickable((By.ID, "firstName")))
 
 elem_form_first_name = driver.find_element_by_id("firstName")
-elem_form_first_name.send_keys(first_name)
+# elem_form_first_name.send_keys(first_name)
+for letter in first_name:
+    time.sleep(random.randint(0, 1))  # sleep between 1 and 3 seconds
+    elem_form_first_name.send_keys(first_name)
+
+time.sleep(randint(1,3))
+
 
 elem_form_last_name = driver.find_element_by_id("lastName")
 elem_form_last_name.send_keys(last_name)
+time.sleep(randint(1,3))
 
 elem_form_email = driver.find_element_by_id("email")
 elem_form_email.send_keys(email)
@@ -95,36 +103,43 @@ time.sleep(1)
 driver.execute_script("findAddress()")
 
 
-print("sleep 5 secs to find addresses")
-time.sleep(5) # Improve this
+print("Finding Address")
+time.sleep(3) # Improve this
 
 elem_dropdown_addy_list = driver.find_element(By.ID, 'select-country-selectized')
 elem_dropdown_addy_list.click()
 
-elem_form_address = browser.find_element(By.ID, "select-country-selectized")
-elem_form_address.send_keys(doorNumber + Keys.ENTER)
+elem_form_address = driver.find_element(By.ID, "select-country-selectized")
+elem_form_address.send_keys(door_number + Keys.ENTER)
 
-elem_radio_same_as_billing = driver.find_element_by_id("same_as_billing")
-elem_radio_same_as_billing.click()
+# elem_radio_same_as_billing = driver.find_element_by_id("same_as_billing")
+# elem_radio_same_as_billing.click()
 
-elem_captcha = browser.find_element(By.ID, "free_sim_captcha")
-
-browser.execute_script("""
+# Remove captcha
+elem_captcha = driver.find_element_by_id('free_sim_captcha')
+driver.execute_script("""
 var element = arguments[0];
 element.parentNode.removeChild(element);
 """, elem_captcha)
 
-# elem_dropdown_addy_select = Select(driver.find_element_by_id("selectize-dropdown-content"))
-# elem_dropdown_addy_select.select_by_index(0)
+# Submit
+print("Sleeping for 20 to prevent bot protection")
+time.sleep(20)
+elem_button_proceed_2 = driver.find_element_by_id("lyca_cart_newsim_button1")
+elem_button_proceed_2.click()
 
+# driver.execute_script("nc_newsim_open_tab2('payment','sid','tid')")
 
-
-
-
-
-
-# Submit elem_captcha
-# nc_newsim_open_tab2('payment','sid','tid')
+try:
+    elem_valid_order = WebDriverWait(driver, 50).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "hello-my-plan-content")))
+    print("VALID ORDER")
+    time.sleep(5)
+    driver.close()
+except:
+    print("Something went wrong... Please try again")
+    time.sleep(10)
+    driver.close()
 
 
 time.sleep(10)
