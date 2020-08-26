@@ -83,7 +83,7 @@ elem_form_first_name = driver.find_element_by_id("firstName")
 # elem_form_first_name.send_keys(first_name)
 for letter in first_name:
     time.sleep(random.randint(0, 1))  # sleep between 1 and 3 seconds
-    elem_form_first_name.send_keys(first_name)
+    elem_form_first_name.send_keys(letter)
 
 time.sleep(randint(1,3))
 
@@ -104,7 +104,7 @@ driver.execute_script("findAddress()")
 
 
 print("Finding Address")
-time.sleep(3) # Improve this
+time.sleep(3) # Improve this by not waiting time and instead detecting when it appears on the page
 
 elem_dropdown_addy_list = driver.find_element(By.ID, 'select-country-selectized')
 elem_dropdown_addy_list.click()
