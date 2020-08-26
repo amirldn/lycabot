@@ -26,3 +26,11 @@ New &amp; Improved version of the original lycasimbot
 - Add an option to allow for multiple sim cards in one order
 - Add captcha-bypass prevention (fails the bot 50% of the time as of right now)
 - Add ability to manually enter address for users living in flats or uncommon addresses etc.
+
+
+**Known Issues**
+- Does not natively work with Windows PC due to a line of code. Current work around is change the line 
+
+         with open('./data/names.txt') as file_with_names:
+         into 
+         with open(' <DIRECTORY OF THE GIT DIR YOU CLONED>/data/names.txt') as file_with_names:
