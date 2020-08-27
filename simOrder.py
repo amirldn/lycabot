@@ -1,3 +1,12 @@
+import time
+from random import randint
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 from func import *
 
 
@@ -101,7 +110,7 @@ def from_terms_to_entry():
     #     print("Proceed button not found, falling back to submitting JS")
     #     driver.execute_script("nc_newsim_open_tab2('payment','sid','tid')")
 
-    time.sleep(5)
+    time.sleep(7)
 
     if driver.current_url == "https://www.lycamobile.co.uk/en/success-freesim/":
         print("SIM Ordered successfully! Closing in 5 seconds...")
@@ -113,7 +122,7 @@ def from_terms_to_entry():
         if True:
             print("The site detected you were a bot, running again!")
             # times_ran += 1
-            time.sleep(5)
+            time.sleep(2)
             for i in range(no_of_sims):
                 add_sim()
             from_terms_to_entry()
@@ -130,6 +139,7 @@ postcode_in, door_number = address()
 
 # Generates name
 first_name, last_name, email = person_generate()
+
 
 # Opens website to order the sim card
 driver = webdriver.Chrome()
