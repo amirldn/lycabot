@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from func import *
+import undetected_chromedriver as uc
 
 
 def detect_elem(elem_id):
@@ -42,42 +43,22 @@ def from_terms_to_entry():
         EC.element_to_be_clickable((By.ID, "firstName"))
     )
 
-    print("Form loaded")
-
+    print("Form loaded - entering address")
     elem_form_first_name = driver.find_element_by_id("firstName")
-    # for letter in first_name:
-    #     time.sleep(randint(0, 1))  # sleep between 0 and 1 seconds
-    #     elem_form_first_name.send_keys(letter)
     elem_form_first_name.send_keys(first_name)
-
-    time.sleep(randint(1, 3))
-
     elem_form_last_name = driver.find_element_by_id("lastName")
-    # for letter in last_name:
-    #     time.sleep(randint(0, 1))
-    #     elem_form_last_name.send_keys(letter)
     elem_form_last_name.send_keys(last_name)
-
-    time.sleep(randint(1, 3))
-
     elem_form_email = driver.find_element_by_id("email")
-    # for letter in email:
-    #     time.sleep(randint(0, 1))
-    #     elem_form_email.send_keys(letter)
     elem_form_email.send_keys(email)
-
-    time.sleep(randint(1, 3))
-
     elem_form_post = driver.find_element_by_id("postCodes")
     elem_form_post.send_keys(postcode_in)
-
-    time.sleep(1)
     driver.execute_script("findAddress()")
 
+    # TODO: Improve this by not waiting time and instead detecting when it appears on the page
     print("Finding Address")
     time.sleep(
         3
-    )  # Improve this by not waiting time and instead detecting when it appears on the page
+    )
 
     elem_dropdown_addy_list = driver.find_element(By.ID, "select-country-selectized")
     elem_dropdown_addy_list.click()
@@ -88,7 +69,7 @@ def from_terms_to_entry():
     elem_radio_same_as_billing = driver.find_element_by_id("same_as_billing")
     elem_radio_same_as_billing.click()
 
-    # Remove captcha
+    # Bypass captcha
     elem_captcha = driver.find_element_by_id("free_sim_captcha")
     driver.execute_script(
         """
@@ -103,36 +84,23 @@ def from_terms_to_entry():
     time.sleep(3)
     driver.execute_script("nc_newsim_open_tab2('payment','sid','tid')")
 
-    # try:
-    #     detect_elem("lyca_cart_newsim_button1").click()
-    #     # elem_button_proceed_2.click()
-    # except:
-    #     print("Proceed button not found, falling back to submitting JS")
-    #     driver.execute_script("nc_newsim_open_tab2('payment','sid','tid')")
+    time.sleep(10)
 
-    time.sleep(7)
-
-    if driver.current_url == "https://www.lycamobile.co.uk/en/success-freesim/":
+    if "success freesim" in driver.title:
         print("SIM Ordered successfully! Closing in 5 seconds...")
         time.sleep(5)
         driver.close()
         quit(0)
     else:
-        # if times_ran < 2:
-        if True:
-            print("The site detected you were a bot, running again!")
-            # times_ran += 1
-            time.sleep(2)
-            for i in range(no_of_sims):
-                add_sim()
-            from_terms_to_entry()
-        else:
-            print("Something went wrong... please try again")
-            quit(2)
+        print("An error occurred, running again!")
+        time.sleep(2)
+        for i in range(no_of_sims):
+            add_sim()
+        from_terms_to_entry()
 
 
 # Asks for number of sims
-no_of_sims = num_of_sims_to_order()
+no_of_sims = 3
 
 # Address Info
 postcode_in, door_number = address()
@@ -140,17 +108,19 @@ postcode_in, door_number = address()
 # Generates name
 first_name, last_name, email = person_generate()
 
-
 # Opens website to order the sim card
-driver = webdriver.Chrome()
+options = uc.ChromeOptions()
+options.headless = True
+options.add_argument('--headless')
+# driver = uc.Chrome(options=options)
+driver = uc.Chrome()
 driver.get("https://www.lycamobile.co.uk/en/order-sim/")
 print("Launching Lycamobile's Site")
 
 # Waits until the radio checkbox for "No thanks" shows up then clicks the button
 detect_elem("online_retention_check_nothanks")
-print("Site loaded")
+print("Site loaded: %s" % driver.title)
 time.sleep(2)
-for i in range(no_of_sims - 1):
+for i in range(no_of_sims):
     add_sim()
-times_ran = 0
 from_terms_to_entry()
